@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P Tv News — Global Broadcast &amp; Digital Broadsheet</title>
+  <meta name="description" content="P Tv News official broadcast and digital broadsheet portal." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    html { font-family: "Plus Jakarta Sans", sans-serif; scroll-behavior: smooth; }
+    h1, h2, h3, .font-editorial { font-family: "Playfair Display", Georgia, serif; text-wrap: balance; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    .drop-cap::first-letter {
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 3rem;
+      font-weight: 700;
+      float: left;
+      line-height: 0.9;
+      margin-right: 0.7rem;
+      margin-top: 0.2rem;
+      color: #1C1917;
+    }
+  </style>
+</head>
+<body class="bg-[#FBF9F5] text-[#1C1917] antialiased min-h-screen flex flex-col">
+
+  <!-- Private Owner Bar (ONLY visible after Admin Passcode unlock) -->
+  <div id="owner-toolbar" class="hidden bg-[#141413] text-white border-b border-stone-800">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 py-2 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <span class="font-semibold text-white">Owner Mode Active</span>
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button type="button" onclick="openAdminModal('publish')" class="px-3 py-1 bg-[#B91C1C] hover:bg-[#991B1B] text-white font-semibold cursor-pointer">Admin Panel</button>
+        <button type="button" onclick="lockAdmin()" class="px-3 py-1 border border-stone-700 hover:border-stone-400 text-stone-300 cursor-pointer">Lock Admin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Public 3-Zone Top Bar (Zero admin controls shown to visitors) -->
+  <header class="sticky top-0 z-40 bg-[#FBF9F5]/95 backdrop-blur-sm border-b border-stone-200">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between gap-8">
+      <a href="#top" onclick="resetFilters()" class="font-serif text-2xl font-bold tracking-tight text-[#1C1917] whitespace-nowrap shrink-0">
+        P Tv News
+      </a>
+
+      <nav aria-label="Primary navigation" class="hidden md:flex items-center gap-7 text-sm font-medium text-stone-600">
+        <button type="button" onclick="setCategory('All')" class="hover:text-[#1C1917] hover:underline underline-offset-4 whitespace-nowrap shrink-0 cursor-pointer">Top Stories</button>
+        <button type="button" onclick="setCategory('National')" class="hover:text-[#1C1917] hover:underline underline-offset-4 whitespace-nowrap shrink-0 cursor-pointer">National</button>
+        <button type="button" onclick="setCategory('World')" class="hover:text-[#1C1917] hover:underline underline-offset-4 whitespace-nowrap shrink-0 cursor-pointer">World</button>
+        <button type="button" onclick="setCategory('Business')" class="hover:text-[#1C1917] hover:underline underline-offset-4 whitespace-nowrap shrink-0 cursor-pointer">Business</button>
+        <button type="button" onclick="toggleVideoOnly()" class="hover:text-[#1C1917] hover:underline underline-offset-4 whitespace-nowrap shrink-0 cursor-pointer">Videos</button>
+      </nav>
+
+      <div class="flex items-center gap-3 shrink-0">
+        <a href="#live-studio" class="px-4 py-2 text-xs font-semibold text-white bg-[#B91C1C] hover:bg-[#991B1B] transition-colors whitespace-nowrap shrink-0">
+          Watch Live
+        </a>
+        <button type="button" onclick="toggleMobileMenu()" aria-label="Menu" class="md:hidden w-10 h-10 flex items-center justify-center border border-stone-300 text-[#1C1917]">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <nav id="mobile-nav" class="hidden md:hidden border-t border-stone-200 bg-[#FBF9F5] px-6 py-4 flex-col gap-2 text-sm font-medium text-stone-700">
+      <button type="button" onclick="setCategory('All'); toggleMobileMenu();" class="py-1.5 text-left">Top Stories</button>
+      <button type="button" onclick="setCategory('National'); toggleMobileMenu();" class="py-1.5 text-left">National</button>
+      <button type="button" onclick="setCategory('World'); toggleMobileMenu();" class="py-1.5 text-left">World</button>
+      <button type="button" onclick="setCategory('Business'); toggleMobileMenu();" class="py-1.5 text-left">Business</button>
+      <button type="button" onclick="toggleVideoOnly(); toggleMobileMenu();" class="py-1.5 text-left">Videos</button>
+    </nav>
+  </header>
+
+  <!-- Edition Ribbon & Breaking Ticker -->
+  <div id="top" class="bg-[#F5F2EB] border-b border-stone-200">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 py-2.5 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs text-stone-600">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span id="today-date" class="font-semibold text-[#1C1917]"></span>
+        <span>·</span>
+        <span id="live-clock" class="font-mono tabular-nums text-stone-700"></span>
+        <span>·</span>
+        <span>Global Digital Broadsheet</span>
+      </div>
+      <div id="ticker-bar" class="hidden text-xs text-[#1C1917] font-medium truncate max-w-xl"></div>
+    </div>
+  </div>
+
+  <!-- Main Broadsheet Area -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 lg:px-10 py-8 lg:py-10">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-stone-300">
+      <div id="desk-tabs" class="flex flex-wrap items-center gap-1.5"></div>
+      <div class="w-full lg:w-64">
+        <input
+          id="search-input"
+          type="search"
+          oninput="state.search = this.value; renderNewsFeed();"
+          placeholder="Search news..."
+          class="w-full px-3.5 py-2 text-sm bg-white border border-stone-300 text-[#1C1917] placeholder:text-stone-400 focus:outline-none focus:border-[#1C1917]"
+        />
+      </div>
+    </div>
+
+    <div id="news-container" class="mt-8"></div>
+  </main>
+
+  <!-- Clean Public Footer -->
+  <footer class="bg-[#141413] text-stone-300 border-t border-stone-800 mt-12">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div>
+        <p class="font-serif text-2xl font-bold text-white">P Tv News</p>
+        <p class="mt-1 text-xs text-stone-400">Independent Digital Broadsheet &amp; Broadcast Portal</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-5 text-xs text-stone-400">
+        <button type="button" onclick="setCategory('National')" class="hover:text-white cursor-pointer">National</button>
+        <button type="button" onclick="setCategory('World')" class="hover:text-white cursor-pointer">World</button>
+        <button type="button" onclick="setCategory('Business')" class="hover:text-white cursor-pointer">Business</button>
+        <a href="#live-studio" class="hover:text-white">Live Studio</a>
+      </div>
+    </div>
+    <div class="border-t border-stone-800">
+      <div class="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-500">
+        <p>&copy; 2026 P Tv News. All rights reserved.</p>
+        <button type="button" onclick="requestAdminAccess('publish')" class="text-stone-500 hover:text-stone-300 cursor-pointer">Staff Access</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ADMIN PASSCODE LOCK MODAL -->
+  <div id="auth-modal" onclick="closeAuthModal()" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div onclick="event.stopPropagation()" class="w-full max-w-sm bg-[#FBF9F5] text-[#1C1917] border border-stone-300 shadow-2xl p-6">
+      <div class="flex items-start justify-between gap-4 pb-4 border-b border-stone-200">
+        <div>
+          <p class="text-[11px] font-mono uppercase tracking-widest text-stone-500">P Tv News</p>
+          <h2 class="font-serif text-lg font-semibold text-[#1C1917]">Staff Access</h2>
+        </div>
+        <button type="button" onclick="closeAuthModal()" class="text-xs text-stone-500 hover:text-[#1C1917] cursor-pointer">Close</button>
+      </div>
+      <form onsubmit="handleAuthSubmit(event)" class="mt-5 space-y-4">
+        <div>
+          <label for="auth-pin-input" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Admin Passcode</label>
+          <input id="auth-pin-input" type="password" required placeholder="Enter passcode..." class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300 focus:outline-none focus:border-[#1C1917]" />
+          <p id="auth-error" class="hidden mt-1.5 text-xs text-[#B91C1C] font-medium">Incorrect passcode. Access denied.</p>
+        </div>
+        <button type="submit" class="w-full py-2.5 px-4 text-xs font-semibold uppercase tracking-wider bg-[#141413] text-white hover:bg-stone-800 cursor-pointer">Unlock Admin Panel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- PRIVATE ADMIN PANEL MODAL -->
+  <div id="admin-modal" onclick="closeAdminModal()" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-6">
+    <div onclick="event.stopPropagation()" class="w-full max-w-4xl max-h-[94vh] bg-[#FBF9F5] text-[#1C1917] border border-stone-300 shadow-2xl flex flex-col overflow-hidden">
+      <div class="px-6 py-4 bg-[#141413] text-white flex flex-wrap items-center justify-between gap-4 shrink-0">
+        <div>
+          <p class="text-[11px] font-mono uppercase tracking-widest text-stone-400">P Tv News Editorial CMS</p>
+          <h2 class="font-serif text-xl font-semibold">Newsroom Admin Panel</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="lockAdmin()" class="px-3 py-1.5 text-xs border border-stone-700 hover:border-stone-400 cursor-pointer">Lock Admin</button>
+          <button type="button" onclick="closeAdminModal()" class="px-3 py-1.5 text-xs border border-stone-700 hover:border-stone-400 cursor-pointer">Close</button>
+        </div>
+      </div>
+
+      <div class="px-6 pt-3 bg-[#F5F2EB] border-b border-stone-300 flex flex-wrap gap-2 shrink-0">
+        <button type="button" data-admin-tab="publish" onclick="switchAdminTab('publish')" class="admin-tab-btn px-4 py-2 text-xs font-semibold border-b-2 cursor-pointer">Post News / Photo / Video</button>
+        <button type="button" data-admin-tab="manage" onclick="switchAdminTab('manage')" class="admin-tab-btn px-4 py-2 text-xs font-semibold border-b-2 cursor-pointer">Manage Posts</button>
+        <button type="button" data-admin-tab="live" onclick="switchAdminTab('live')" class="admin-tab-btn px-4 py-2 text-xs font-semibold border-b-2 cursor-pointer">Live TV &amp; Ticker</button>
+        <button type="button" data-admin-tab="security" onclick="switchAdminTab('security')" class="admin-tab-btn px-4 py-2 text-xs font-semibold border-b-2 cursor-pointer">Passcode</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6">
+        <!-- TAB 1: PUBLISH -->
+        <form id="admin-post-form" onsubmit="handlePublishPost(event)" class="space-y-5">
+          <input type="hidden" id="edit-post-id" value="" />
+          <div id="admin-form-notice" class="hidden p-3 bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-medium"></div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label for="post-title" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">News Headline *</label>
+              <input id="post-title" type="text" required placeholder="Enter breaking headline or report title..." class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300 focus:outline-none focus:border-[#1C1917]" />
+            </div>
+
+            <div>
+              <label for="post-category" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Category / Desk</label>
+              <select id="post-category" class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300 focus:outline-none focus:border-[#1C1917]">
+                <option value="National">National</option>
+                <option value="World">World</option>
+                <option value="Politics">Politics</option>
+                <option value="Business">Business</option>
+                <option value="Science & Tech">Science &amp; Tech</option>
+                <option value="Sports">Sports</option>
+                <option value="Culture">Culture</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="post-placement" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Front Page Position</label>
+              <select id="post-placement" class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300 focus:outline-none focus:border-[#1C1917]">
+                <option value="lead">Lead Headline (Top Hero)</option>
+                <option value="featured">Featured Report Grid</option>
+                <option value="standard">Standard Dispatch</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="post-author" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Reporter / Author Name</label>
+              <input id="post-author" type="text" placeholder="e.g. P Tv News Desk" class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300 focus:outline-none focus:border-[#1C1917]" />
+            </div>
+
+            <div>
+              <label for="post-bureau" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Location / Bureau</label>
+              <input id="post-bureau" type="text" placeholder="e.g. Dhaka Desk" class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300 focus:outline-none focus:border-[#1C1917]" />
+            </div>
+
+            <div class="md:col-span-2">
+              <label for="post-deck" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Short Summary / Deck</label>
+              <input id="post-deck" type="text" placeholder="1-2 sentence summary..." class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300 focus:outline-none focus:border-[#1C1917]" />
+            </div>
+
+            <div class="md:col-span-2">
+              <label for="post-body" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Full News Article *</label>
+              <textarea id="post-body" rows="5" required placeholder="Write the complete report here..." class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300 focus:outline-none focus:border-[#1C1917]"></textarea>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-stone-200">
+            <div class="p-4 bg-[#F5F2EB] border border-stone-300 space-y-3">
+              <p class="text-xs font-semibold uppercase tracking-wider text-[#1C1917]">Attach Photo</p>
+              <input id="post-image-file" type="file" accept="image/*" onchange="previewSelectedImage(this)" class="block w-full text-xs text-stone-600 file:mr-3 file:py-1.5 file:px-3 file:border file:border-stone-300 file:text-xs file:bg-white cursor-pointer" />
+              <input id="post-image-url" type="url" placeholder="Or paste Photo URL" class="w-full px-3 py-2 text-xs bg-white border border-stone-300" />
+              <input id="post-image-caption" type="text" placeholder="Photo caption (optional)" class="w-full px-3 py-2 text-xs bg-white border border-stone-300" />
+              <div id="image-preview-box" class="hidden"><img id="image-preview-el" alt="Preview" class="w-full h-32 object-cover border border-stone-300" /></div>
+            </div>
+
+            <div class="p-4 bg-[#F5F2EB] border border-stone-300 space-y-3">
+              <p class="text-xs font-semibold uppercase tracking-wider text-[#1C1917]">Attach Video</p>
+              <input id="post-video-file" type="file" accept="video/*" onchange="previewSelectedVideo(this)" class="block w-full text-xs text-stone-600 file:mr-3 file:py-1.5 file:px-3 file:border file:border-stone-300 file:text-xs file:bg-white cursor-pointer" />
+              <input id="post-video-url" type="url" placeholder="Or paste YouTube / MP4 Link" class="w-full px-3 py-2 text-xs bg-white border border-stone-300" />
+              <div id="video-preview-box" class="hidden"><video id="video-preview-el" controls class="w-full h-32 bg-black border border-stone-300"></video></div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-stone-200">
+            <button type="button" onclick="resetPostForm()" class="px-4 py-2 text-xs font-medium border border-stone-300 bg-white cursor-pointer">Clear Form</button>
+            <button type="submit" id="publish-submit-btn" class="px-6 py-2.5 text-xs font-semibold uppercase tracking-wider bg-[#B91C1C] text-white hover:bg-[#991B1B] cursor-pointer">Publish News</button>
+          </div>
+        </form>
+
+        <!-- TAB 2: MANAGE -->
+        <div id="admin-manage-panel" class="hidden space-y-4">
+          <div id="admin-posts-list" class="divide-y divide-stone-200"></div>
+        </div>
+
+        <!-- TAB 3: LIVE TV -->
+        <form id="admin-live-form" onsubmit="handleSaveLiveSettings(event)" class="hidden space-y-5">
+          <div id="live-form-notice" class="hidden p-3 bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-medium"></div>
+          <div>
+            <label for="live-ticker-input" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Breaking News Ticker</label>
+            <input id="live-ticker-input" type="text" placeholder="Breaking: Headline 1  |  Headline 2" class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300" />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="live-program-title" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Program Title</label>
+              <input id="live-program-title" type="text" placeholder="Evening News Bulletin" class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300" />
+            </div>
+            <div>
+              <label for="live-anchor-name" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Anchor Name</label>
+              <input id="live-anchor-name" type="text" placeholder="Studio Anchor" class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300" />
+            </div>
+          </div>
+          <div class="p-4 bg-[#F5F2EB] border border-stone-300 space-y-3">
+            <p class="text-xs font-semibold uppercase tracking-wider text-[#1C1917]">Live Broadcast Video Source</p>
+            <input id="live-video-file" type="file" accept="video/*" class="block w-full text-xs text-stone-600 file:mr-3 file:py-1.5 file:px-3 file:border file:border-stone-300 file:text-xs file:bg-white cursor-pointer" />
+            <input id="live-video-url" type="url" placeholder="Or paste YouTube Live / MP4 URL" class="w-full px-3 py-2 text-xs bg-white border border-stone-300" />
+            <label class="inline-flex items-center gap-2 text-xs font-medium text-[#1C1917] cursor-pointer pt-1">
+              <input id="live-active-toggle" type="checkbox" class="w-4 h-4 accent-[#B91C1C]" />
+              <span>Show "On Air" live indicator</span>
+            </label>
+          </div>
+          <div class="flex justify-end pt-3 border-t border-stone-200">
+            <button type="submit" class="px-6 py-2.5 text-xs font-semibold uppercase tracking-wider bg-[#1C1917] text-white cursor-pointer">Save Studio Settings</button>
+          </div>
+        </form>
+
+        <!-- TAB 4: PASSCODE SECURITY -->
+        <form id="admin-security-form" onsubmit="handleChangePasscode(event)" class="hidden max-w-md space-y-4">
+          <div id="security-form-notice" class="hidden p-3 bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-medium"></div>
+          <div>
+            <h3 class="font-serif text-lg font-semibold text-[#1C1917]">Change Admin Passcode</h3>
+            <p class="mt-1 text-xs text-stone-600">Only someone with this passcode can open the Admin Panel.</p>
+          </div>
+          <div>
+            <label for="new-pin" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">New Passcode</label>
+            <input id="new-pin" type="password" required placeholder="Minimum 4 characters" class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300" />
+          </div>
+          <div>
+            <label for="confirm-pin" class="block text-xs font-semibold uppercase tracking-wider text-stone-600 mb-1.5">Confirm Passcode</label>
+            <input id="confirm-pin" type="password" required placeholder="Re-enter passcode" class="w-full px-3.5 py-2.5 text-sm bg-white border border-stone-300" />
+          </div>
+          <p id="security-error" class="hidden text-xs text-[#B91C1C] font-medium"></p>
+          <button type="submit" class="px-5 py-2.5 text-xs font-semibold uppercase tracking-wider bg-[#1C1917] text-white cursor-pointer">Save New Passcode</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTICLE READER MODAL -->
+  <div id="article-modal" onclick="closeArticle()" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-[2px] flex justify-center items-start p-0 sm:p-4 lg:p-8">
+    <div onclick="event.stopPropagation()" class="w-full max-w-4xl h-full sm:h-[92vh] bg-[#FBF9F5] text-[#1C1917] border border-stone-300 shadow-2xl flex flex-col overflow-hidden">
+      <div class="shrink-0 bg-[#FBF9F5] border-b border-stone-200">
+        <div class="h-0.5 w-full bg-stone-200"><div id="reader-progress" class="h-full bg-[#B91C1C]" style="width:0%"></div></div>
+        <div class="px-6 py-3.5 flex items-center justify-between gap-4">
+          <div id="reader-meta" class="text-xs text-stone-600 truncate"></div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" id="reader-edit-btn" class="hidden px-3 py-1.5 text-xs font-medium border border-stone-300 bg-white hover:border-stone-500 cursor-pointer">Edit</button>
+            <button type="button" onclick="closeArticle()" class="px-3 py-1.5 text-xs font-medium border border-stone-300 bg-white hover:border-stone-500 cursor-pointer">Close</button>
+          </div>
+        </div>
+      </div>
+      <div id="reader-scroll" onscroll="updateReaderProgress()" class="flex-1 overflow-y-auto px-6 sm:px-10 py-10">
+        <article id="reader-body" class="max-w-3xl mx-auto"></article>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DB_NAME = 'ptv_news_standalone_db';
+    const DB_VER = 1;
+    const PIN_KEY = 'ptv_html_admin_pin';
+    const SESSION_KEY = 'ptv_html_admin_session';
+    const DEFAULT_PIN = 'ptv2026';
+    const DESKS = ['All', 'National', 'World', 'Politics', 'Business', 'Science & Tech', 'Sports', 'Culture'];
+
+    let state = {
+      isAdmin: sessionStorage.getItem(SESSION_KEY) === '1',
+      pendingTab: 'publish',
+      posts: [],
+      live: { id: 'main', tickerText: '', programTitle: 'P Tv News Live Studio', anchorName: '', bureauName: 'Main Newsroom', liveVideoUrl: '', isLiveActive: false },
+      category: 'All',
+      videoOnly: false,
+      search: '',
+      objectUrls: []
+    };
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VER);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains('posts')) db.createObjectStore('posts', { keyPath: 'id' });
+          if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'id' });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function dbGetAllPosts() {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('posts', 'readonly');
+        const req = tx.objectStore('posts').getAll();
+        req.onsuccess = () => resolve((req.result || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function dbPutPost(post) {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('posts', 'readwrite');
+        tx.objectStore('posts').put(post);
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function dbDeletePost(id) {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('posts', 'readwrite');
+        tx.objectStore('posts').delete(id);
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function dbGetSettings() {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('settings', 'readonly');
+        const req = tx.objectStore('settings').get('main');
+        req.onsuccess = () => resolve(req.result || state.live);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function dbPutSettings(s) {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('settings', 'readwrite');
+        tx.objectStore('settings').put(s);
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    function escapeHTML(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    function getYouTubeEmbed(url) {
+      const m = String(url || '').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/live\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+      return m ? `https://www.youtube.com/embed/${m[1]}` : null;
+    }
+
+    function makeObjUrl(blob) {
+      if (!blob) return '';
+      const u = URL.createObjectURL(blob);
+      state.objectUrls.push(u);
+      return u;
+    }
+
+    function clearObjUrls() {
+      state.objectUrls.forEach(u => URL.revokeObjectURL(u));
+      state.objectUrls = [];
+    }
+
+    async function loadAndRender() {
+      clearObjUrls();
+      state.posts = await dbGetAllPosts();
+      state.live = await dbGetSettings();
+      document.getElementById('owner-toolbar').classList.toggle('hidden', !state.isAdmin);
+      renderRibbon();
+      renderDeskTabs();
+      renderNewsFeed();
+      renderManageList();
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('today-date').textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('live-clock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function renderRibbon() {
+      const tb = document.getElementById('ticker-bar');
+      if (state.live.tickerText) {
+        tb.innerHTML = `<span class="font-semibold text-[#B91C1C] mr-1.5">Breaking:</span>${escapeHTML(state.live.tickerText)}`;
+        tb.classList.remove('hidden');
+      } else {
+        tb.classList.add('hidden');
+      }
+    }
+
+    function renderDeskTabs() {
+      document.getElementById('desk-tabs').innerHTML = DESKS.map(d => {
+        const active = state.category === d && !state.videoOnly;
+        return `<button type="button" onclick="setCategory('${d}')" class="px-3.5 py-2 text-xs font-medium whitespace-nowrap shrink-0 cursor-pointer ${active ? 'bg-[#1C1917] text-[#FBF9F5]' : 'bg-[#EBE6DF] text-stone-700 hover:text-[#1C1917]'}">${d}</button>`;
+      }).join('') + `<button type="button" onclick="toggleVideoOnly()" class="px-3.5 py-2 text-xs font-medium border whitespace-nowrap shrink-0 cursor-pointer ${state.videoOnly ? 'bg-[#B91C1C] text-white border-[#B91C1C]' : 'bg-white text-stone-700 border-stone-300'}">Videos Only</button>`;
+    }
+
+    function renderMediaBlock(post, aspectClass) {
+      const yt = getYouTubeEmbed(post.videoUrl);
+      const vidSrc = post.videoBlob ? makeObjUrl(post.videoBlob) : (!yt ? post.videoUrl : '');
+      const imgSrc = post.imageBlob ? makeObjUrl(post.imageBlob) : post.imageUrl;
+
+      if (yt) return `<div class="${aspectClass} bg-black border border-stone-200 overflow-hidden"><iframe src="${escapeHTML(yt)}" title="${escapeHTML(post.title)}" class="w-full h-full" allowfullscreen></iframe></div>`;
+      if (vidSrc) return `<div class="${aspectClass} bg-black border border-stone-200 overflow-hidden"><video src="${escapeHTML(vidSrc)}" controls class="w-full h-full object-cover"></video></div>`;
+      if (imgSrc) return `<div class="${aspectClass} bg-stone-200 border border-stone-200 overflow-hidden"><img src="${escapeHTML(imgSrc)}" alt="${escapeHTML(post.title)}" class="w-full h-full object-cover" /></div>`;
+      return '';
+    }
+
+    function renderLiveStudioBox() {
+      const s = state.live;
+      const yt = getYouTubeEmbed(s.liveVideoUrl);
+      const vidSrc = s.liveVideoBlob ? makeObjUrl(s.liveVideoBlob) : (!yt ? s.liveVideoUrl : '');
+
+      let screen = '';
+      if (yt) screen = `<iframe src="${escapeHTML(yt)}" title="Live Studio" class="w-full h-full" allowfullscreen></iframe>`;
+      else if (vidSrc) screen = `<video src="${escapeHTML(vidSrc)}" controls class="w-full h-full object-cover"></video>`;
+      else {
+        screen = `
+          <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-[#0B0B0A]">
+            <p class="text-[11px] font-mono uppercase tracking-widest text-stone-400">P Tv News Studio</p>
+            <p class="mt-2 font-serif text-lg text-white">Broadcast Standby</p>
+            ${state.isAdmin ? '<button type="button" onclick="openAdminModal(\'live\')" class="mt-4 px-4 py-2 text-xs font-semibold bg-[#B91C1C] text-white cursor-pointer">Add Live Video / Stream</button>' : ''}
+          </div>`;
+      }
+
+      return `
+        <div id="live-studio" class="bg-[#141413] text-[#FBF9F5] border border-stone-800 flex flex-col justify-between h-full">
+          <div class="px-5 py-3.5 border-b border-stone-800 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-xs font-mono uppercase tracking-wider">
+              ${s.isLiveActive ? '<span class="w-2 h-2 rounded-full bg-[#DC2626] animate-pulse"></span><span class="text-[#F87171] font-semibold">On Air</span>' : '<span class="text-stone-400">Studio Feed</span>'}
+            </div>
+            ${state.isAdmin ? '<button type="button" onclick="openAdminModal(\'live\')" class="text-[11px] font-mono text-stone-400 hover:text-white cursor-pointer">Configure</button>' : ''}
+          </div>
+          <div class="aspect-[16/9] bg-black overflow-hidden">${screen}</div>
+          <div class="p-5">
+            <p class="text-xs text-stone-400">${escapeHTML(s.anchorName || 'P Tv News Desk')} · ${escapeHTML(s.bureauName || 'Main Studio')}</p>
+            <h3 class="mt-1 font-serif text-xl text-white">${escapeHTML(s.programTitle || 'P Tv News Live Studio')}</h3>
+          </div>
+        </div>`;
+    }
+
+    function renderNewsFeed() {
+      const container = document.getElementById('news-container');
+      const q = state.search.trim().toLowerCase();
+      const filtered = state.posts.filter(p => {
+        if (state.category !== 'All' && p.category !== state.category) return false;
+        if (state.videoOnly && !p.videoBlob && !p.videoUrl) return false;
+        if (!q) return true;
+        return (p.title + p.deck + p.body + p.author + p.bureau + p.category).toLowerCase().includes(q);
+      });
+
+      if (state.posts.length === 0) {
+        container.innerHTML = `
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
+            <div class="lg:col-span-7 bg-[#F5F2EB] border border-stone-300 p-8 sm:p-12 flex flex-col justify-center">
+              <p class="text-xs font-sans uppercase tracking-widest text-[#B91C1C] font-semibold">P Tv News Edition</p>
+              <h1 class="mt-3 font-serif text-3xl sm:text-4xl font-semibold text-[#1C1917]">Today&rsquo;s Edition Is Being Prepared</h1>
+              <p class="mt-3 text-base text-stone-600 leading-relaxed max-w-xl">
+                No dispatches have been published yet. New reports, photojournalism, and broadcast bulletins will appear here as soon as our editorial desk publishes them.
+              </p>
+              ${state.isAdmin ? `
+                <div class="mt-7 flex flex-wrap items-center gap-3">
+                  <button type="button" onclick="openAdminModal('publish')" class="px-5 py-3 text-xs font-semibold uppercase tracking-wider bg-[#B91C1C] text-white hover:bg-[#991B1B] cursor-pointer">Post First News / Photo / Video</button>
+                </div>` : ''}
+            </div>
+            <div class="lg:col-span-5">${renderLiveStudioBox()}</div>
+          </div>`;
+        return;
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="py-16 text-center border border-stone-200 bg-[#F5F2EB]">
+            <p class="font-serif text-2xl text-[#1C1917]">No stories match your current filter.</p>
+            <button type="button" onclick="resetFilters()" class="mt-4 px-4 py-2 text-xs font-semibold bg-[#1C1917] text-white cursor-pointer">Show All Stories</button>
+          </div>`;
+        return;
+      }
+
+      const lead = filtered.find(p => p.placement === 'lead') || filtered[0];
+      const others = filtered.filter(p => p.id !== lead.id);
+      const leadMedia = renderMediaBlock(lead, 'aspect-[16/9]');
+
+      const heroHTML = `
+        <section class="pb-10 border-b border-stone-300 grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
+          <article class="lg:col-span-7 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest text-stone-500">
+                <span class="font-semibold text-[#B91C1C]">${escapeHTML(lead.category)}</span>
+                <span>·</span><span>${escapeHTML(lead.bureau || 'News Desk')}</span>
+                <span>·</span><span>${new Date(lead.createdAt).toLocaleDateString()}</span>
+              </div>
+              <h1 class="mt-3 font-serif text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold leading-[1.14] text-[#1C1917]">
+                <button type="button" onclick="openArticle('${lead.id}')" class="text-left hover:text-stone-700 cursor-pointer">${escapeHTML(lead.title)}</button>
+              </h1>
+              ${lead.deck ? `<p class="mt-3 text-base sm:text-lg text-stone-700 leading-relaxed">${escapeHTML(lead.deck)}</p>` : ''}
+              <p class="mt-3 text-xs text-stone-600">By <strong class="text-[#1C1917]">${escapeHTML(lead.author || 'P Tv News')}</strong></p>
+            </div>
+            <div class="mt-6">
+              ${leadMedia}
+              ${lead.imageCaption ? `<p class="mt-2 text-xs font-serif italic text-stone-500">${escapeHTML(lead.imageCaption)}</p>` : ''}
+              <div class="mt-4 pt-3 border-t border-stone-200 flex items-center justify-between">
+                <button type="button" onclick="openArticle('${lead.id}')" class="text-sm font-semibold text-[#1C1917] hover:text-[#B91C1C] cursor-pointer">Read Full Dispatch ↗</button>
+              </div>
+            </div>
+          </article>
+          <aside class="lg:col-span-5">${renderLiveStudioBox()}</aside>
+        </section>`;
+
+      const gridHTML = others.length > 0 ? `
+        <section class="pt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          ${others.map(p => {
+            const media = renderMediaBlock(p, 'aspect-[4/3]');
+            return `
+              <article class="flex flex-col justify-between border-b border-stone-200 pb-6">
+                <div>
+                  ${media ? `<div class="mb-4">${media}</div>` : ''}
+                  <div class="flex flex-wrap items-center gap-2 text-xs text-stone-500">
+                    <span class="font-semibold uppercase tracking-wider text-[#B91C1C]">${escapeHTML(p.category)}</span>
+                    <span>·</span><span>${escapeHTML(p.bureau || 'Desk')}</span>
+                    <span>·</span><span>${new Date(p.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <h2 class="mt-2 font-serif text-xl font-semibold leading-snug text-[#1C1917]">
+                    <button type="button" onclick="openArticle('${p.id}')" class="text-left hover:text-[#B91C1C] cursor-pointer">${escapeHTML(p.title)}</button>
+                  </h2>
+                  <p class="mt-2 text-sm text-stone-600 leading-relaxed line-clamp-3">${escapeHTML(p.deck || p.body)}</p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-stone-200 flex items-center justify-between text-xs text-stone-500">
+                  <span>By ${escapeHTML(p.author || 'P Tv News')}</span>
+                  <button type="button" onclick="openArticle('${p.id}')" class="font-medium text-[#1C1917] hover:underline cursor-pointer">Read</button>
+                </div>
+              </article>`;
+          }).join('')}
+        </section>` : '';
+
+      container.innerHTML = heroHTML + gridHTML;
+    }
+
+    function requestAdminAccess(tab) {
+      if (state.isAdmin) {
+        openAdminModal(tab);
+      } else {
+        state.pendingTab = tab || 'publish';
+        document.getElementById('auth-pin-input').value = '';
+        document.getElementById('auth-error').classList.add('hidden');
+        document.getElementById('auth-modal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('auth-pin-input').focus(), 50);
+      }
+    }
+
+    function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const entered = document.getElementById('auth-pin-input').value.trim();
+      const currentPin = localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
+      if (entered === currentPin) {
+        state.isAdmin = true;
+        sessionStorage.setItem(SESSION_KEY, '1');
+        closeAuthModal();
+        loadAndRender();
+        openAdminModal(state.pendingTab);
+      } else {
+        document.getElementById('auth-error').classList.remove('hidden');
+      }
+    }
+
+    function lockAdmin() {
+      state.isAdmin = false;
+      sessionStorage.removeItem(SESSION_KEY);
+      closeAdminModal();
+      loadAndRender();
+    }
+
+    function openAdminModal(tab) {
+      if (!state.isAdmin) { requestAdminAccess(tab); return; }
+      document.getElementById('admin-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      switchAdminTab(tab || 'publish');
+      if (tab === 'live') {
+        document.getElementById('live-ticker-input').value = state.live.tickerText || '';
+        document.getElementById('live-program-title').value = state.live.programTitle || '';
+        document.getElementById('live-anchor-name').value = state.live.anchorName || '';
+        document.getElementById('live-video-url').value = state.live.liveVideoUrl || '';
+        document.getElementById('live-active-toggle').checked = !!state.live.isLiveActive;
+      }
+    }
+
+    function closeAdminModal() {
+      document.getElementById('admin-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function switchAdminTab(tab) {
+      document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        const active = btn.dataset.adminTab === tab;
+        btn.className = `admin-tab-btn px-4 py-2 text-xs font-semibold border-b-2 cursor-pointer ${active ? 'border-[#B91C1C] text-[#1C1917]' : 'border-transparent text-stone-500 hover:text-[#1C1917]'}`;
+      });
+      document.getElementById('admin-post-form').classList.toggle('hidden', tab !== 'publish');
+      document.getElementById('admin-manage-panel').classList.toggle('hidden', tab !== 'manage');
+      document.getElementById('admin-live-form').classList.toggle('hidden', tab !== 'live');
+      document.getElementById('admin-security-form').classList.toggle('hidden', tab !== 'security');
+    }
+
+    function previewSelectedImage(input) {
+      const box = document.getElementById('image-preview-box');
+      const img = document.getElementById('image-preview-el');
+      if (input.files && input.files[0]) { img.src = URL.createObjectURL(input.files[0]); box.classList.remove('hidden'); }
+      else box.classList.add('hidden');
+    }
+
+    function previewSelectedVideo(input) {
+      const box = document.getElementById('video-preview-box');
+      const vid = document.getElementById('video-preview-el');
+      if (input.files && input.files[0]) { vid.src = URL.createObjectURL(input.files[0]); box.classList.remove('hidden'); }
+      else box.classList.add('hidden');
+    }
+
+    async function handlePublishPost(e) {
+      e.preventDefault();
+      if (!state.isAdmin) return;
+      const editId = document.getElementById('edit-post-id').value;
+      const existing = editId ? state.posts.find(p => p.id === editId) : null;
+      const imgFile = document.getElementById('post-image-file').files[0];
+      const vidFile = document.getElementById('post-video-file').files[0];
+
+      const post = {
+        id: editId || 'post-' + Date.now(),
+        title: document.getElementById('post-title').value.trim(),
+        category: document.getElementById('post-category').value,
+        placement: document.getElementById('post-placement').value,
+        author: document.getElementById('post-author').value.trim() || 'P Tv News Desk',
+        bureau: document.getElementById('post-bureau').value.trim() || 'Newsroom',
+        deck: document.getElementById('post-deck').value.trim(),
+        body: document.getElementById('post-body').value.trim(),
+        imageUrl: document.getElementById('post-image-url').value.trim(),
+        imageCaption: document.getElementById('post-image-caption').value.trim(),
+        videoUrl: document.getElementById('post-video-url').value.trim(),
+        imageBlob: imgFile ? imgFile : (existing ? existing.imageBlob : undefined),
+        videoBlob: vidFile ? vidFile : (existing ? existing.videoBlob : undefined),
+        createdAt: existing ? existing.createdAt : new Date().toISOString()
+      };
+
+      await dbPutPost(post);
+      resetPostForm();
+      const notice = document.getElementById('admin-form-notice');
+      notice.textContent = editId ? 'News dispatch updated.' : 'News published to P Tv News.';
+      notice.classList.remove('hidden');
+      setTimeout(() => notice.classList.add('hidden'), 3000);
+      await loadAndRender();
+    }
+
+    function resetPostForm() {
+      document.getElementById('admin-post-form').reset();
+      document.getElementById('edit-post-id').value = '';
+      document.getElementById('publish-submit-btn').textContent = 'Publish News';
+      document.getElementById('image-preview-box').classList.add('hidden');
+      document.getElementById('video-preview-box').classList.add('hidden');
+    }
+
+    function renderManageList() {
+      const list = document.getElementById('admin-posts-list');
+      if (state.posts.length === 0) {
+        list.innerHTML = '<p class="py-8 text-center text-sm text-stone-500">No news published yet.</p>';
+        return;
+      }
+      list.innerHTML = state.posts.map(p => `
+        <div class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-xs text-stone-500">${escapeHTML(p.category)} · ${escapeHTML(p.placement.toUpperCase())} · ${new Date(p.createdAt).toLocaleString()}</p>
+            <p class="font-serif text-base font-semibold text-[#1C1917] truncate">${escapeHTML(p.title)}</p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="editPost('${p.id}')" class="px-3 py-1.5 text-xs border border-stone-300 bg-white hover:border-[#1C1917] cursor-pointer">Edit</button>
+            <button type="button" onclick="removePost('${p.id}')" class="px-3 py-1.5 text-xs border border-red-200 text-[#B91C1C] bg-white hover:bg-red-50 cursor-pointer">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function editPost(id) {
+      if (!state.isAdmin) return;
+      const p = state.posts.find(x => x.id === id);
+      if (!p) return;
+      openAdminModal('publish');
+      document.getElementById('edit-post-id').value = p.id;
+      document.getElementById('post-title').value = p.title;
+      document.getElementById('post-category').value = p.category;
+      document.getElementById('post-placement').value = p.placement;
+      document.getElementById('post-author').value = p.author;
+      document.getElementById('post-bureau').value = p.bureau;
+      document.getElementById('post-deck').value = p.deck;
+      document.getElementById('post-body').value = p.body;
+      document.getElementById('post-image-url').value = p.imageUrl || '';
+      document.getElementById('post-image-caption').value = p.imageCaption || '';
+      document.getElementById('post-video-url').value = p.videoUrl || '';
+      document.getElementById('publish-submit-btn').textContent = 'Update News';
+    }
+
+    async function removePost(id) {
+      if (!state.isAdmin) return;
+      await dbDeletePost(id);
+      await loadAndRender();
+    }
+
+    async function handleSaveLiveSettings(e) {
+      e.preventDefault();
+      if (!state.isAdmin) return;
+      const vidFile = document.getElementById('live-video-file').files[0];
+      const settings = {
+        id: 'main',
+        tickerText: document.getElementById('live-ticker-input').value.trim(),
+        programTitle: document.getElementById('live-program-title').value.trim() || 'P Tv News Live Studio',
+        anchorName: document.getElementById('live-anchor-name').value.trim(),
+        bureauName: 'Main Newsroom',
+        liveVideoUrl: document.getElementById('live-video-url').value.trim(),
+        liveVideoBlob: vidFile ? vidFile : state.live.liveVideoBlob,
+        isLiveActive: document.getElementById('live-active-toggle').checked
+      };
+      await dbPutSettings(settings);
+      const notice = document.getElementById('live-form-notice');
+      notice.textContent = 'Live broadcast & ticker settings saved.';
+      notice.classList.remove('hidden');
+      setTimeout(() => notice.classList.add('hidden'), 3000);
+      await loadAndRender();
+    }
+
+    function handleChangePasscode(e) {
+      e.preventDefault();
+      if (!state.isAdmin) return;
+      const np = document.getElementById('new-pin').value.trim();
+      const cp = document.getElementById('confirm-pin').value.trim();
+      const err = document.getElementById('security-error');
+      if (np.length < 4) { err.textContent = 'Passcode must be at least 4 characters.'; err.classList.remove('hidden'); return; }
+      if (np !== cp) { err.textContent = 'Passcodes do not match.'; err.classList.remove('hidden'); return; }
+      err.classList.add('hidden');
+      localStorage.setItem(PIN_KEY, np);
+      document.getElementById('admin-security-form').reset();
+      const ok = document.getElementById('security-form-notice');
+      ok.textContent = 'Admin passcode updated.';
+      ok.classList.remove('hidden');
+      setTimeout(() => ok.classList.add('hidden'), 3000);
+    }
+
+    function openArticle(id) {
+      const p = state.posts.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('reader-meta').innerHTML = `<strong class="text-[#1C1917] uppercase tracking-wider">P Tv News</strong> · ${escapeHTML(p.category)} · ${escapeHTML(p.bureau)}`;
+      const editBtn = document.getElementById('reader-edit-btn');
+      editBtn.classList.toggle('hidden', !state.isAdmin);
+      editBtn.onclick = () => { closeArticle(); editPost(p.id); };
+
+      const media = renderMediaBlock(p, 'aspect-[16/9]');
+      const paragraphs = p.body.split(/\n+/).filter(Boolean);
+
+      document.getElementById('reader-body').innerHTML = `
+        <header class="border-b border-stone-300 pb-6">
+          <div class="text-xs uppercase tracking-widest text-stone-500">
+            <span class="font-semibold text-[#B91C1C]">${escapeHTML(p.category)}</span> · ${escapeHTML(p.bureau)} · ${new Date(p.createdAt).toLocaleDateString()}
+          </div>
+          <h1 class="mt-3 font-serif text-3xl sm:text-4xl font-semibold leading-[1.15] text-[#1C1917]">${escapeHTML(p.title)}</h1>
+          ${p.deck ? `<p class="mt-3 text-lg text-stone-700 leading-relaxed">${escapeHTML(p.deck)}</p>` : ''}
+          <p class="mt-4 text-xs text-stone-600">By <strong class="text-[#1C1917]">${escapeHTML(p.author)}</strong></p>
+        </header>
+        ${media ? `<figure class="mt-8">${media}${p.imageCaption ? `<figcaption class="mt-2 text-xs font-serif italic text-stone-500">${escapeHTML(p.imageCaption)}</figcaption>` : ''}</figure>` : ''}
+        <div class="mt-8 max-w-2xl space-y-5 text-[17px] leading-[1.8] text-stone-800">
+          ${paragraphs.map((para, idx) => `<p class="${idx === 0 ? 'drop-cap' : ''}">${escapeHTML(para)}</p>`).join('')}
+        </div>`;
+
+      document.getElementById('article-modal').classList.remove('hidden');
+      document.getElementById('reader-scroll').scrollTop = 0;
+      document.getElementById('reader-progress').style.width = '0%';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeArticle() {
+      document.getElementById('article-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function updateReaderProgress() {
+      const el = document.getElementById('reader-scroll');
+      const max = el.scrollHeight - el.clientHeight;
+      document.getElementById('reader-progress').style.width = (max <= 0 ? 100 : Math.min(100, Math.round((el.scrollTop / max) * 100))) + '%';
+    }
+
+    function setCategory(cat) { state.category = cat; state.videoOnly = false; renderDeskTabs(); renderNewsFeed(); }
+    function toggleVideoOnly() { state.videoOnly = !state.videoOnly; renderDeskTabs(); renderNewsFeed(); }
+    function resetFilters() { state.category = 'All'; state.videoOnly = false; state.search = ''; document.getElementById('search-input').value = ''; renderDeskTabs(); renderNewsFeed(); }
+    function toggleMobileMenu() {
+      const m = document.getElementById('mobile-nav');
+      m.classList.toggle('hidden');
+      m.classList.toggle('flex');
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        requestAdminAccess('publish');
+      }
+    });
+
+    if (window.location.hash === '#admin' || new URLSearchParams(window.location.search).has('admin')) {
+      setTimeout(() => requestAdminAccess('publish'), 100);
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+    loadAndRender();
+  </script>
+</body>
+</html>
